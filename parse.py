@@ -46,4 +46,7 @@ def get_tokens(files):
 
 
 if __name__ == '__main__':
-    get_tokens(get_reuters_files())
+    try:
+        get_tokens(get_reuters_files())
+    except FileNotFoundError:
+        print("You probably haven't downloaded the Reuters files.\nTry running 'python3 get_reuters.py' first.")
