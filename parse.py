@@ -1,6 +1,7 @@
 import os
 from nltk.tokenize import word_tokenize
 from bs4 import BeautifulSoup
+from get_reuters import get_reuters
 
 
 this_directory = os.path.dirname(os.path.realpath(__file__))
@@ -11,6 +12,8 @@ tokens = []
 
 
 def get_reuters_files():
+    get_reuters()
+
     for file in os.listdir(reuters_directory):
         if file.endswith(reuters_extension):
             reuters_files.append(os.path.join(reuters_directory, file))
@@ -19,34 +22,31 @@ def get_reuters_files():
 
 
 def get_tokens(files):
-    documents_without_body = 0
-
     for file in files:
         with open(file) as file_to_read:
             data = file_to_read.read()
 
+        """
+        Find all REUTERS tags.
+        These represent the number of documents.
+        """
         soup = BeautifulSoup(data, "html.parser")
-        documents = soup.find_all("reuters")                                # find all <REUTERS>...</REUTERS>
-        print("Found %d documents." % len(documents))                       # number of <REUTERS>...</REUTERS>
+        documents = soup.find_all("reuters")
+        print("Found %d documents." % len(documents))
 
         for document in documents:
-            document_id = int(document['newid'])                            # NEWID attribute of REUTERS tag
+            # NEWID attribute of REUTERS tag
+            document_id = int(document['newid'])
 
-            if document.body:                                               # is there a BODY tag in REUTERS?
-                body = document.body.text                                   # BODY tag in REUTERS
+            """
+            Is there a BODY tag in REUTERS?
+            If so, get tuples of (term, document_id).
+            """
+            if document.body:
+                body = document.body.text
                 terms = word_tokenize(body)
-                token_pairs = [(term, document_id) for term in terms]       # tuples containing (term, document_id)
+                token_pairs = [(term, document_id) for term in terms]
                 tokens.extend(token_pairs)
-            else:
-                documents_without_body += 1
 
-    print("There are %d documents without a body." % documents_without_body)
     print("There are %d tokens." % len(tokens))
     return tokens
-
-
-if __name__ == '__main__':
-    try:
-        get_tokens(get_reuters_files())
-    except FileNotFoundError:
-        print("You probably haven't downloaded the Reuters files.\nTry running 'python3 get_reuters.py' first.")

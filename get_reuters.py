@@ -10,13 +10,12 @@ list_of_files = os.listdir(this_directory)
 
 def get_reuters():
     if "reuters21578" not in list_of_files:
+        print("Downloading Reuters files...")
         file = wget.download(reuters_url, this_directory)
         tar = tarfile.open(file)
         tar.extractall(path="reuters21578")
         tar.close()
         os.remove(file)
-    else:
-        print("You already have the necessary reuters21578 directory.")
 
 
 if __name__ == '__main__':
