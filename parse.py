@@ -1,3 +1,6 @@
+#! /usr/bin/env python3
+# coding: utf-8
+
 from nltk.tokenize import word_tokenize
 from bs4 import BeautifulSoup
 
@@ -14,11 +17,18 @@ def get_tokens(files):
     :return: list of tokens
     """
     tokens = []
+    number_of_documents = 0
+    print("Parsing Reuters files...")
 
     for file in files:
-        soup = BeautifulSoup(open(file), "html.parser")
+        """
+        We will use ISO-8859-1 encoding, because reut2-017.sgm is yielding a UnicodeDecodeError.
+        We could always just put the 'errors' parameter to 'ignore' in the open() method.
+        But after running a diff command, the only difference is the presence if a 'ü' character. Why not include it?
+        """
+        soup = BeautifulSoup(open(file, encoding="ISO-8859-1"), "html.parser")
         documents = soup.find_all("reuters")
-        print("Found %d documents." % len(documents))
+        number_of_documents += len(documents)
 
         for document in documents:
             document_id = int(document['newid'])
@@ -29,5 +39,5 @@ def get_tokens(files):
                 token_pairs = [(term, document_id) for term in terms]
                 tokens.extend(token_pairs)
 
-    print("There are %d tokens." % len(tokens))
+    print("Found %s documents and %s tokens." % ("{:,}".format(number_of_documents), "{:,}".format(len(tokens))))
     return tokens

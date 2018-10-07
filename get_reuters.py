@@ -1,3 +1,6 @@
+#! /usr/bin/env python3
+# coding: utf-8
+
 import tarfile
 import wget
 import os
@@ -5,7 +8,6 @@ from definitions import ROOT_DIR
 
 
 reuters_url = "http://www.daviddlewis.com/resources/testcollections/reuters21578/reuters21578.tar.gz"
-list_of_files = os.listdir(ROOT_DIR)
 
 reuters_directory = ROOT_DIR + "/reuters21578/"
 reuters_extension = ".sgm"
@@ -18,9 +20,10 @@ def get_reuters():
     Extract contents into 'reuters21578' directory.
     Delete tar file.
     """
-    if "reuters21578" not in list_of_files:
+    if not os.path.exists(reuters_directory):
         print("Downloading Reuters files...")
         file = wget.download(reuters_url, ROOT_DIR)
+        print()
         tar = tarfile.open(file)
         tar.extractall(path=reuters_directory)
         tar.close()
