@@ -32,7 +32,6 @@ def get_tokens(files, remove_stopwords=False, stem=False):
         """
         soup = BeautifulSoup(open(file, encoding="ISO-8859-1"), "html.parser")
         documents = soup.find_all("reuters")
-        number_of_documents += len(documents)
 
         for document in documents:
             document_id = int(document['newid'])
@@ -44,8 +43,9 @@ def get_tokens(files, remove_stopwords=False, stem=False):
                     terms = compress(terms, remove_stopwords, stem)
                 token_pairs = [(term, document_id) for term in terms]
                 tokens.extend(token_pairs)
+                number_of_documents += 1
 
-    print("Found %s documents and %s tokens." % ("{:,}".format(number_of_documents), "{:,}".format(len(tokens))))
+    print("Found %s documents with bodies and %s tokens." % ("{:,}".format(number_of_documents), "{:,}".format(len(tokens))))
     return tokens
 
 
