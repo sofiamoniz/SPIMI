@@ -144,16 +144,39 @@ class SPIMI:
 
     def merge_blocks(self, block_files):
         """
+        Merging the block files.
 
-        :param block_files:
+        First, we initialize a list containing an open stream of all block files, which we will subsequently read.
+        Next, we initialize a list containing the first line of each of those block files.
+        NOTE: When we see a [:-1], it is used to delete the trailing newline in the string returned when reading a file.
+
+        We keep a variable containing the most recent term also. At first, we initialize it to an empty string "".
+
+        We run a check to ensure that each file isn't empty. When you read an empty file, you get returned an empty
+        string "". We want to delete those files from the list from the beginning.
+
+        Then, we open the index file, with write permissions.
+        We run the following sequence as long as there are still block files to be read:
+            - In the list of lines, we find the index of the one which comes first alphabetically, compared to the rest.
+            - Using that, we compare the term in the line to the most recent term:
+                • If they're not equal, we create a new line in the index with the new word, and its postings from the
+                  current block file.
+                • If they're equal, then since it's the most recent term, it's the most recent (last) line in the index
+                  file currently. So we just extend the term's postings list by adding on to it in the index file.
+            - After all of that, we replace the line we just used in the list of lines, with the next line of the block
+              file. If there are no more lines to be read, we'd get an empty string "", in which case we'd close and
+              delete the block file from the list of block files, as well as its line from the list of lines.
+            - Once there are no more block files, we close the index file.
+
+        :param block_files: list of block files which will be merged together to create an index file.
         """
         block_files = [open(block_file, "r") for block_file in block_files]
-        lines = [block_file.readline() for block_file in block_files]
+        lines = [block_file.readline()[:-1] for block_file in block_files]
         most_recent_term = ""
 
         index = 0
         for block_file in block_files:
-            if not lines[index]:
+            if lines[index] == "":
                 block_files.pop(index)
                 lines.pop(index)
             else:
@@ -161,25 +184,22 @@ class SPIMI:
 
         with open(self.output_index, "w") as output_index:
             while len(block_files) > 0:
-                small = lines.index(reduce(lambda x, y: min(x, y), lines))
-                line = lines[small][:-1]                                              # delete trailing newline
+
+                smallest_word_index = lines.index(reduce(lambda x, y: min(x, y), lines))
+                line = lines[smallest_word_index]
+
                 if line.split()[0] != most_recent_term:
-                    output_index.write("%s\n" % line)
+                    output_index.write("\n%s" % line)
                     most_recent_term = line.split()[0]
                 else:
-                    output_index.write("%s %s\n" % (most_recent_term, " ".join(line.split()[1:])))
+                    output_index.write(" %s" % " ".join(line.split()[1:]))
 
-                lines[small] = block_files[small].readline()
+                lines[smallest_word_index] = block_files[smallest_word_index].readline()[:-1]
 
-                """
-                If there are no more lines left to be read (which would return an empty string ""), close the
-                corresponding block file and remove it from the list of block files, as well as its line from the list
-                of lines.
-                """
-                if lines[small] == "":
-                    block_files[small].close()
-                    block_files.pop(small)
-                    lines.pop(small)
+                if lines[smallest_word_index] == "":
+                    block_files[smallest_word_index].close()
+                    block_files.pop(smallest_word_index)
+                    lines.pop(smallest_word_index)
 
             output_index.close()
 
