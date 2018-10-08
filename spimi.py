@@ -3,16 +3,12 @@
 
 import sys
 import os
-import shutil
 from definitions import ROOT_DIR
 
 
-DISK_DIR = ROOT_DIR + "/DISK/"
+class SPIMI:
 
-
-class SpimiInvert:
-
-    def __init__(self, tokens, block_size_limit=1):
+    def __init__(self, tokens, output_directory="DISK", block_size_limit=1):
         """
         Initiate the SPIMI inverted with a list of tokens and a block size limit.
         :param tokens: list of tuples containing a term and a document ID.
@@ -21,31 +17,28 @@ class SpimiInvert:
         self.it_tokens = iter(tokens)
         self.output_prefix = "BLOCK"
         self.output_suffix = ".txt"
+        self.output_directory = "%s/%s/" % (ROOT_DIR, output_directory)
         self.block_size_limit = block_size_limit
         self.block_number = 0
 
+        self.mkdir_output_directory(self.output_directory)
+
     @staticmethod
-    def mkdir_disk():
+    def mkdir_output_directory(output_directory):
         """
-        Make a DISK directory in which we will store disk blocks.
+        Make an output directory in which we will store disk blocks.
         If it already exists, ask user if we should overwrite it.
+        :param output_directory: directory in which output files will be generated.
         :return: True if directory is created, else False.
         """
         try:
-            os.mkdir(DISK_DIR)
-            print("DISK directory created.")
+            os.mkdir(output_directory)
+            print("%s directory created." % output_directory)
             return True
         except FileExistsError:
-            choices = {"y": True, "n": False}
-            choice = input("DISK directory already exists. Would you like to overwrite it? [y/n]\n").lower()
-            while choice not in choices:
-                choice = input("Please type in 'y' or 'n', case insensitive.\n").lower()
-            if choices[choice]:
-                shutil.rmtree(DISK_DIR)
-                os.mkdir(DISK_DIR)
-                return True
-            else:
-                return False
+            print("%s directory already exists. Erasing its contents..." % output_directory)
+            for file in os.listdir(output_directory):
+                os.unlink(os.path.join(output_directory, file))
 
     @staticmethod
     def add_to_dictionary(dictionary, term):
@@ -87,9 +80,9 @@ class SpimiInvert:
         return [term for term in sorted(dictionary)]
 
     @staticmethod
-    def write_block_to_disk(terms, dictionary, output_file):
+    def write_block_to_output_directory(terms, dictionary, output_file):
         """
-        Create BLOCK*.txt file(s) in DISK directory.
+        Create BLOCK*.txt file(s) in the output directory.
         The text file(s) will contain terms, with the document IDs in which they appear.
         :param terms: list of SORTED terms.
         :param dictionary: dictionary containing terms as keys, and their corresponding list of postings as values.
@@ -102,7 +95,7 @@ class SpimiInvert:
                 file.write(line)
         return output_file
 
-    def run(self):
+    def create_inverted_index(self):
         """
         Run the single-pass in-memory indexing (SPIMI) inversion algorithm.
         We start off with an empty dictionary.
@@ -131,13 +124,13 @@ class SpimiInvert:
 
                     self.add_to_postings_list(postings_list, token[1])
             except StopIteration:
-                print("Done iterating through tokens.")
+                print("Done iterating through tokens. SPIMI inversion complete.\n")
                 iteration_complete = True
 
             self.block_number += 1
             terms = self.sort_terms(dictionary)
 
-            output_file = "%s%s%d%s" % (DISK_DIR, self.output_prefix, self.block_number, self.output_suffix)
-            output_files.append(self.write_block_to_disk(terms, dictionary, output_file))
+            output_file = "%s%s%d%s" % (self.output_directory, self.output_prefix, self.block_number, self.output_suffix)
+            output_files.append(self.write_block_to_output_directory(terms, dictionary, output_file))
 
         return output_files
