@@ -4,7 +4,6 @@
 import sys
 import os
 from definitions import ROOT_DIR
-from functools import reduce
 
 
 class SPIMI:
@@ -31,7 +30,6 @@ class SPIMI:
         Make an output directory in which we will store disk blocks.
         If it already exists, ask user if we should overwrite it.
         :param output_directory: directory in which output files will be generated.
-        :return: True if directory is created, else False.
         """
         try:
             os.mkdir(output_directory)
@@ -97,7 +95,7 @@ class SPIMI:
                 file.write(line)
         return block_file
 
-    def create_inverted_index(self):
+    def construct_index(self):
         """
         Run the single-pass in-memory indexing (SPIMI) inversion algorithm.
         We start off with an empty dictionary.
@@ -108,7 +106,9 @@ class SPIMI:
         If the dictionary gets too big, we dump its contents into a block file, and restart the process with a new empty
         dictionary, iterating through the rest of the list of tokens.
 
-        At the end of the method, the block files are used to create the final inverted index.
+        At the end of the method, the block files are used to construct the final inverted index.
+
+        :return: a method call to merge the generated block files.
         """
         block_files = []
         iteration_complete = False
@@ -140,7 +140,7 @@ class SPIMI:
         else:
             print("%d block files have been generated." % self.block_number)
 
-        self.merge_blocks(block_files)
+        return self.merge_blocks(block_files)
 
     def merge_blocks(self, block_files):
         """
@@ -158,6 +158,7 @@ class SPIMI:
         Then, we open the index file, with write permissions.
         We run the following sequence as long as there are still block files to be read:
             - In the list of lines, we find the index of the one which comes first alphabetically, compared to the rest.
+              We do this by finding the minimum value in the list.
             - Using that, we compare the term in the line to the most recent term:
                 • If they're not equal, we create a new line in the index with the new word, and its postings from the
                   current block file.
@@ -169,8 +170,9 @@ class SPIMI:
             - Once there are no more block files, we close the index file.
 
         :param block_files: list of block files which will be merged together to create an index file.
+        :return: a method call to create a dictionary object from the merged index.
         """
-        block_files = [open(block_file, "r") for block_file in block_files]
+        block_files = [open(block_file) for block_file in block_files]
         lines = [block_file.readline()[:-1] for block_file in block_files]
         most_recent_term = ""
 
@@ -185,8 +187,8 @@ class SPIMI:
         with open(self.output_index, "w") as output_index:
             while len(block_files) > 0:
 
-                smallest_word_index = lines.index(reduce(lambda x, y: min(x, y), lines))
-                line = lines[smallest_word_index]
+                min_index = lines.index(min(lines))
+                line = lines[min_index]
 
                 if line.split()[0] != most_recent_term:
                     output_index.write("\n%s" % line)
@@ -194,13 +196,42 @@ class SPIMI:
                 else:
                     output_index.write(" %s" % " ".join(line.split()[1:]))
 
-                lines[smallest_word_index] = block_files[smallest_word_index].readline()[:-1]
+                lines[min_index] = block_files[min_index].readline()[:-1]
 
-                if lines[smallest_word_index] == "":
-                    block_files[smallest_word_index].close()
-                    block_files.pop(smallest_word_index)
-                    lines.pop(smallest_word_index)
+                if lines[min_index] == "":
+                    block_files[min_index].close()
+                    block_files.pop(min_index)
+                    lines.pop(min_index)
 
             output_index.close()
 
         print("Merge complete. The merged index can be found at %s.\n" % self.output_index)
+        return self.get_index()
+
+    def get_index(self):
+        """
+        This method will read the index file and create a dictionary object from it, containing terms as keys and their
+        corresponding postings as values.
+
+        We first initialize an empty dictionary, which will be the inverted index.
+        Then we open the index file and return a stream. We read the first line since it's just a newline generated in
+        the file from the merge_blocks() method.
+
+        For every line of the index file:
+        - We split it, using a space (" ") as the delimiter (default).
+        - The first value in the list is the term (-> key).
+        - The rest of the values in the list are the postings (-> value).
+            • We make sure to make the postings a (sorted) set, so as to eliminate duplicates.
+
+        :return: the inverted index, i.e. the dictionary containing terms as keys, and a set of postings as values.
+        """
+        inverted_index = {}
+
+        index_file = open(self.output_index)
+        index_file.readline()
+
+        for line in index_file:
+            line = line.split()
+            inverted_index[line[0]] = sorted(set(map(int, line[1:])))
+
+        return inverted_index

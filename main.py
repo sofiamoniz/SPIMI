@@ -11,4 +11,4 @@ if __name__ == '__main__':
     tokens = get_tokens(reuters_files[:1], remove_stopwords=True, stem=True)
 
     spimi = SPIMI(tokens=tokens, output_directory="DISK", output_index="index", block_size_limit=1)
-    spimi.create_inverted_index()
+    index = spimi.construct_index()
