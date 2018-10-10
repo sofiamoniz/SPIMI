@@ -24,7 +24,14 @@ class Query:
 
     @abc.abstractmethod
     def execute(self):
+        if self.__class__.__name__ == "Query":
+            print("You are conducting a query using the %s class." % self.__class__.__name__)
+            print("Make sure to use either AndQuery or OrQuery.\n")
         return
+
+    def print_results(self, results):
+        print("%s: %s" % (self.__class__.__name__, self.words))
+        print("%d result(s) found: %s\n" % (len(results), ", ".join(map(str, results))))
 
 
 class AndQuery(Query):
@@ -34,10 +41,10 @@ class AndQuery(Query):
 
     def execute(self):
         postings_lists = self.get_postings_lists()
-        result = sorted(postings_lists[0].intersection(*[postings_list for postings_list in postings_lists[1:]]))
+        results = sorted(postings_lists[0].intersection(*[postings_list for postings_list in postings_lists[1:]]))
 
-        print("%d result(s) found: %s" % (len(result), ", ".join(map(str, result))))
-        return result
+        self.print_results(results)
+        return results
 
 
 class OrQuery(Query):
@@ -47,7 +54,7 @@ class OrQuery(Query):
 
     def execute(self):
         postings_lists = self.get_postings_lists()
-        result = sorted(postings_lists[0].union(*[postings_list for postings_list in postings_lists[1:]]))
+        results = sorted(postings_lists[0].union(*[postings_list for postings_list in postings_lists[1:]]))
 
-        print("%d result(s) found: %s" % (len(result), ", ".join(map(str, result))))
-        return result
+        self.print_results(results)
+        return results

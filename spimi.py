@@ -4,11 +4,18 @@
 import sys
 import os
 from definitions import ROOT_DIR
+from reuters_tokens import *
+from get_reuters import *
 
 
 class SPIMI:
 
-    def __init__(self, tokens, output_directory="DISK", output_index="index", block_size_limit=1):
+    def __init__(
+            self,
+            output_directory="DISK", output_index="index",
+            block_prefix="BLOCK", block_size_limit=1,
+            remove_stopwords=False, stem=False
+    ):
         """
         Initiate the SPIMI inverted with a list of tokens and a block size limit.
         :param tokens: list of tuples containing a term and a document ID.
@@ -16,13 +23,33 @@ class SPIMI:
         :param output_index: name of index file which will be generated and placed in output directory.
         :param block_size_limit: maximum size of a block, in megabytes. Default is 1.
         """
-        self.it_tokens = iter(tokens)
-        self.output_prefix = "BLOCK"
-        self.output_suffix = ".txt"
         self.output_directory = "/".join([ROOT_DIR, output_directory])
-        self.output_index = "/".join([self.output_directory, output_index + self.output_suffix])
+
+        self.remove_stopwords = remove_stopwords
+        self.stem = stem
+
         self.block_size_limit = block_size_limit
+        self.block_prefix = block_prefix
         self.block_number = 0
+        self.block_suffix = ".txt"
+
+        self.output_index = "/".join([self.output_directory, output_index + self.block_suffix])
+
+        if os.path.exists(self.output_directory):
+            choices = {"y": True, "n": False}
+            choice = input("%s already exists. Would you like to erase its contents? [y/n]\n" % self.output_directory)
+            while choice not in choices:
+                choice = input("You need to type in either 'y' or 'n'.\n")
+            if choices[choice]:
+                self.__init__tokens()
+            else:
+                print("Grabbing the %s file.\n" % self.output_index)
+        else:
+            self.__init__tokens()
+
+    def __init__tokens(self):
+        self.tokens = get_tokens(get_reuters_files()[:1], remove_stopwords=self.remove_stopwords, stem=self.stem)
+        self.it_tokens = iter(self.tokens)
 
         self.mkdir_output_directory(self.output_directory)
 
@@ -112,6 +139,9 @@ class SPIMI:
 
         :return: a method call to merge the generated block files.
         """
+        if os.path.exists(self.output_index):
+            return self.get_index()
+
         block_files = []
         iteration_complete = False
 
@@ -134,7 +164,7 @@ class SPIMI:
             self.block_number += 1
             terms = self.sort_terms(dictionary)
 
-            block_file = "/".join([self.output_directory, "".join([self.output_prefix, str(self.block_number), self.output_suffix])])
+            block_file = "/".join([self.output_directory, "".join([self.block_prefix, str(self.block_number), self.block_suffix])])
             block_files.append(self.write_block_to_output_directory(terms, dictionary, block_file))
 
         if self.block_number == 1:
