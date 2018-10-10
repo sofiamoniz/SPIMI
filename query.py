@@ -6,9 +6,14 @@ import abc
 
 class Query:
 
-    def __init__(self, index, words):
+    def __init__(self, index, terms):
+        """
+        Query constructor.
+        :param index: dictionary with terms as keys, and their postings list as values.
+        :param terms: query which will be conducted
+        """
         self.index = index
-        self.words = words
+        self.terms = terms.split()
 
     def get_postings_lists(self):
         """
@@ -16,10 +21,9 @@ class Query:
         For each terms, store in a dictionary the documents in which the term appears (postings list).
         :return: list of postings lists found from the terms in the query.
         """
-        terms = self.words.split()
         results = {}
 
-        for term in terms:
+        for term in self.terms:
             try:
                 results[term] = set(self.index[term])
             except KeyError:
@@ -44,14 +48,14 @@ class Query:
         Print out terms in the query, and the postings found.
         :param results: list of postings.
         """
-        print("%s: %s" % (self.__class__.__name__, self.words))
+        print("%s: %s" % (self.__class__.__name__, " ".join(self.terms)))
         print("%d result(s) found: %s\n" % (len(results), ", ".join(map(str, results)) if len(results) > 0 else "there are no results matching your query."))
 
 
 class AndQuery(Query):
 
-    def __init__(self, index, words):
-        Query.__init__(self, index, words)
+    def __init__(self, index, terms):
+        Query.__init__(self, index, terms)
 
     def execute(self):
         """
@@ -67,8 +71,8 @@ class AndQuery(Query):
 
 class OrQuery(Query):
 
-    def __init__(self, index, words):
-        Query.__init__(self, index, words)
+    def __init__(self, index, terms):
+        Query.__init__(self, index, terms)
 
     def execute(self):
         """
