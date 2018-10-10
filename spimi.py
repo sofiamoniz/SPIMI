@@ -12,6 +12,8 @@ class SPIMI:
         """
         Initiate the SPIMI inverted with a list of tokens and a block size limit.
         :param tokens: list of tuples containing a term and a document ID.
+        :param output_directory: directory in which merge blocks and index file will be stored.
+        :param output_index: name of index file which will be generated and placed in output directory.
         :param block_size_limit: maximum size of a block, in megabytes. Default is 1.
         """
         self.it_tokens = iter(tokens)
