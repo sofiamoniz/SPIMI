@@ -31,7 +31,7 @@ class Query:
 
     def print_results(self, results):
         print("%s: %s" % (self.__class__.__name__, self.words))
-        print("%d result(s) found: %s\n" % (len(results), ", ".join(map(str, results))))
+        print("%d result(s) found: %s\n" % (len(results), ", ".join(map(str, results)) if len(results) > 0 else "there are no results matching your query."))
 
 
 class AndQuery(Query):

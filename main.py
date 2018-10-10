@@ -1,14 +1,20 @@
 #! /usr/bin/env python3
 # coding: utf-8
 
-from get_reuters import *
-from reuters_tokens import *
-from spimi import *
-from query import *
+from reuters import Reuters
+from spimi import SPIMI
+from query import Query, AndQuery, OrQuery
 
 
 if __name__ == '__main__':
-    spimi = SPIMI(output_directory="DISK", output_index="index", block_size_limit=1, remove_stopwords=False, stem=False)
+    reuters = Reuters(remove_stopwords=False, stem=False)
+
+    spimi = SPIMI(
+        reuters=reuters,
+        output_directory="DISK", output_index="index",
+        block_prefix="EXAMPLE", block_size_limit=1
+    )
+
     index = spimi.construct_index()
 
     OrQuery(index, "updat upgrad").execute()

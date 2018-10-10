@@ -3,30 +3,28 @@
 
 import sys
 import os
+
 from definitions import ROOT_DIR
-from reuters_tokens import *
-from get_reuters import *
 
 
 class SPIMI:
 
     def __init__(
             self,
+            reuters,
             output_directory="DISK", output_index="index",
-            block_prefix="BLOCK", block_size_limit=1,
-            remove_stopwords=False, stem=False
+            block_prefix="BLOCK", block_size_limit=1
     ):
         """
-        Initiate the SPIMI inverted with a list of tokens and a block size limit.
-        :param tokens: list of tuples containing a term and a document ID.
+        Initiate the SPIMI inverter with a list of tokens and a block size limit.
+        :param reuters: Reuters object which will contain reuters files and methods to obtain tokens.
         :param output_directory: directory in which merge blocks and index file will be stored.
         :param output_index: name of index file which will be generated and placed in output directory.
+        :param block_prefix: prefix of block files which will be generated and placed in output directory.
         :param block_size_limit: maximum size of a block, in megabytes. Default is 1.
         """
+        self.reuters = reuters
         self.output_directory = "/".join([ROOT_DIR, output_directory])
-
-        self.remove_stopwords = remove_stopwords
-        self.stem = stem
 
         self.block_size_limit = block_size_limit
         self.block_prefix = block_prefix
@@ -37,18 +35,18 @@ class SPIMI:
 
         if os.path.exists(self.output_directory):
             choices = {"y": True, "n": False}
-            choice = input("%s already exists. Would you like to erase its contents? [y/n]\n" % self.output_directory)
+            choice = input("%s already exists. Would you like to erase its contents? [y/n]\n" % self.output_directory).lower()
             while choice not in choices:
-                choice = input("You need to type in either 'y' or 'n'.\n")
+                choice = input("You need to type in either 'y' or 'n'.\n").lower()
             if choices[choice]:
-                self.__init__tokens()
+                self.__init_tokens()
             else:
                 print("Grabbing the %s file.\n" % self.output_index)
         else:
-            self.__init__tokens()
+            self.__init_tokens()
 
-    def __init__tokens(self):
-        self.tokens = get_tokens(get_reuters_files()[:1], remove_stopwords=self.remove_stopwords, stem=self.stem)
+    def __init_tokens(self):
+        self.tokens = self.reuters.get_tokens()
         self.it_tokens = iter(self.tokens)
 
         self.mkdir_output_directory(self.output_directory)
