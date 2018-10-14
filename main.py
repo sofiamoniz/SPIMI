@@ -19,13 +19,18 @@ args = parser.parse_args()
 
 
 if __name__ == '__main__':
-    print(args)
-    reuters = Reuters(remove_stopwords=True, stem=True, case_folding=True, remove_numbers=True)
+
+    reuters = Reuters(
+        remove_stopwords=args.remove_stopwords,
+        stem=args.stem,
+        case_folding=args.case_folding,
+        remove_numbers=args.remove_numbers
+    )
 
     spimi = SPIMI(
         reuters=reuters,
         output_directory="DISK", output_index="index",
-        block_prefix="BLOCK", max_block_size=1
+        block_prefix="BLOCK", max_block_size=args.max_block_size
     )
 
     index = spimi.construct_index()
