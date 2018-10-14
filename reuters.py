@@ -15,21 +15,31 @@ from definitions import ROOT_DIR
 
 class Reuters:
 
-    def __init__(self, remove_stopwords=False, stem=False):
+    def __init__(self, remove_stopwords=False, stem=False, case_folding=False, remove_numbers=False):
         """
         Initiate the Reuters objects which will contain the reuters files.
         :param remove_stopwords: will we include stopwords?
         :param stem: will we stem the terms?
+        :param case_folding: will we lower terms to their lowercase variant?
+        :param remove_numbers: will we remove terms that are just numbers?
         """
         self.reuters_url = "http://www.daviddlewis.com/resources/testcollections/reuters21578/reuters21578.tar.gz"
         self.reuters_directory = "/".join([ROOT_DIR, "reuters21578"])
 
         self.reuters_files = self.__init_reuters_files()[:1]
+
         self.remove_stopwords = remove_stopwords
         self.stem = stem
+        self.case_folding = case_folding
+        self.remove_numbers = remove_numbers
+
+        self.will_compress = self.remove_stopwords or self.stem or self.case_folding or self.remove_numbers
 
         if self.remove_stopwords:
             self.stopwords = set(stopwords.words("english"))
+
+        if self.stem:
+            self.ps = PorterStemmer()
 
     def get_reuters(self):
         """
@@ -90,7 +100,7 @@ class Reuters:
                 if document.body:
                     body = document.body.text
                     terms = word_tokenize(body)
-                    if self.remove_stopwords or self.stem:
+                    if self.will_compress:
                         terms = self.compress(terms)
                     token_pairs = [(term, document_id) for term in terms]
                     tokens.extend(token_pairs)
@@ -101,19 +111,19 @@ class Reuters:
 
     def compress(self, terms):
         """
-        Remove stopwords from terms list, or stem terms in terms list. Or both.
+        Remove stopwords from terms list, or stem terms in terms list, or lower terms to their lowercase variant, or
+        remove terms that are just numbers.
+        Or do any combination of all.
         :param terms: list of terms to be compressed.
         :return: compressed list of terms.
         """
         if self.remove_stopwords:
-            if self.stem:
-                ps = PorterStemmer()
-                terms = [ps.stem(term) for term in terms if term not in self.stopwords]
-            else:
-                terms = [term for term in terms if term not in self.stopwords]
-        else:
-            if self.stem:
-                ps = PorterStemmer()
-                terms = [ps.stem(term) for term in terms]
+            terms = [term for term in terms if term.lower() not in self.stopwords]
+        if self.stem:
+            terms = [self.ps.stem(term) for term in terms]
+        if self.case_folding:
+            terms = [term.lower() for term in terms]
+        if self.remove_numbers:
+            terms = [term for term in terms if not term.replace(",", "").replace(".", "").isdigit()]
 
         return terms
