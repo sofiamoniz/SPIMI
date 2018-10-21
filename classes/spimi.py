@@ -42,8 +42,6 @@ class SPIMI:
         """
         try:
             os.mkdir(output_directory)
-            print("%s directory created." % output_directory)
-            return True
         except FileExistsError:
             for file in os.listdir(output_directory):
                 os.unlink(os.path.join(output_directory, file))
