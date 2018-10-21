@@ -36,14 +36,16 @@ if __name__ == '__main__':
 
     index = spimi.construct_index()
 
+    if args.remove_stopwords or args.stem or args.case_folding or args.remove_numbers:
+        print("Your index has already been compressed, will use that as unfiltered.")
+
+    table = CompressionTable(index)
+    print(table.generate_table())
+    print()
+
     OrQuery(index, "updat upgrad").execute()
     AndQuery(index, "coke year").execute()
     AndQuery(index, "rubber rice reuter").execute()
     AndQuery(index, "and you").execute()
     Query(index, "wale").execute()
     AndQuery(index, "hard").execute()
-
-    if args.remove_stopwords or args.stem or args.case_folding or args.remove_numbers:
-        print("Your index has already been compressed, will use that as unfiltered.")
-        table = CompressionTable(index)
-        print(table.generate_table())

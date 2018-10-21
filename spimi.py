@@ -33,17 +33,7 @@ class SPIMI:
 
         self.output_index = "/".join([self.output_directory, output_index + self.block_suffix])
 
-        if os.path.exists(self.output_directory):
-            choices = {"y": True, "n": False}
-            choice = input("%s already exists. Would you like to erase its contents? [y/n]\n" % self.output_directory).lower()
-            while choice not in choices:
-                choice = input("You need to type in either 'y' or 'n'.\n").lower()
-            if choices[choice]:
-                self.__init_tokens()
-            else:
-                print("Grabbing the %s file.\n" % self.output_index)
-        else:
-            self.__init_tokens()
+        self.__init_tokens()
 
     def __init_tokens(self):
         self.tokens = self.reuters.get_tokens()
@@ -63,7 +53,7 @@ class SPIMI:
             print("%s directory created." % output_directory)
             return True
         except FileExistsError:
-            print("%s directory already exists. Erasing its contents..." % output_directory)
+            print("%s directory already exists. Overwriting it..." % output_directory)
             for file in os.listdir(output_directory):
                 os.unlink(os.path.join(output_directory, file))
 
