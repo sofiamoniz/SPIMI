@@ -15,7 +15,9 @@ from definitions import ROOT_DIR
 
 class Reuters:
 
-    def __init__(self, docs_per_block=500, remove_stopwords=False, stem=False, case_folding=False, remove_numbers=False):
+    def __init__(self, docs_per_block=500, number_of_files=22,
+                 remove_stopwords=False, stem=False, case_folding=False, remove_numbers=False
+    ):
         """
         Initiate the Reuters objects which will contain the reuters files.
         :param docs_per_block: number of documents per generated block.
@@ -27,7 +29,7 @@ class Reuters:
         self.reuters_url = "http://www.daviddlewis.com/resources/testcollections/reuters21578/reuters21578.tar.gz"
         self.reuters_directory = "/".join([ROOT_DIR, "reuters21578"])
 
-        self.reuters_files = self.__init_reuters_files()[:1]
+        self.reuters_files = self.__init_reuters_files()[:number_of_files]
 
         self.docs_per_block = docs_per_block
 

@@ -1,7 +1,6 @@
 #! /usr/bin/env python3
 # coding: utf-8
 
-import sys
 import os
 
 from definitions import ROOT_DIR
@@ -46,7 +45,6 @@ class SPIMI:
             print("%s directory created." % output_directory)
             return True
         except FileExistsError:
-            print("%s directory already exists. Overwriting it..." % output_directory)
             for file in os.listdir(output_directory):
                 os.unlink(os.path.join(output_directory, file))
 
