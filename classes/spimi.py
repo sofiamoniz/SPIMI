@@ -13,33 +13,26 @@ class SPIMI:
             self,
             reuters,
             output_directory="DISK", output_index="index",
-            block_prefix="BLOCK", max_block_size=1
+            block_prefix="BLOCK"
     ):
         """
-        Initiate the SPIMI inverter with a list of tokens and a block size limit.
+        Initiate the SPIMI inverter with a list of tokens.
         :param reuters: Reuters object which will contain reuters files and methods to obtain tokens.
         :param output_directory: directory in which merge blocks and index file will be stored.
         :param output_index: name of index file which will be generated and placed in output directory.
         :param block_prefix: prefix of block files which will be generated and placed in output directory.
-        :param max_block_size: maximum size of a block, in megabytes. Default is 1.
         """
         self.reuters = reuters
         self.output_directory = "/".join([ROOT_DIR, output_directory])
 
-        self.max_block_size = max_block_size
         self.block_prefix = block_prefix
         self.block_number = 0
         self.block_suffix = ".txt"
 
         self.output_index = "/".join([self.output_directory, output_index + self.block_suffix])
-
-        self.__init_tokens()
-
-    def __init_tokens(self):
-        self.tokens = self.reuters.get_tokens()
-        self.it_tokens = iter(self.tokens)
-
         self.mkdir_output_directory(self.output_directory)
+
+        self.list_of_lists_of_tokens = self.reuters.get_tokens()
 
     @staticmethod
     def mkdir_output_directory(output_directory):
@@ -117,11 +110,8 @@ class SPIMI:
         Run the single-pass in-memory indexing (SPIMI) inversion algorithm.
         We start off with an empty dictionary.
 
-        As long as the size of the dictionary is less than the max_block_size, we iterate through the tokens list and
-        add them to the dictionary, along with their document IDs.
-
-        If the dictionary gets too big, we dump its contents into a block file, and restart the process with a new empty
-        dictionary, iterating through the rest of the list of tokens.
+        For each list of tokens in the list of lists of tokens, generate a dictionary, which will be dumpled into a
+        block file.
 
         At the end of the method, the block files are used to construct the final inverted index.
 
@@ -131,23 +121,18 @@ class SPIMI:
             return self.get_index()
 
         block_files = []
-        iteration_complete = False
 
-        while not iteration_complete:
+        for list_of_tokens in self.list_of_lists_of_tokens:
             dictionary = {}
-            try:
-                while sys.getsizeof(dictionary) / 1024 / 1024 <= self.max_block_size:
-                    token = next(self.it_tokens)
 
-                    if token[0] not in dictionary:
-                        postings_list = self.add_to_dictionary(dictionary, token[0])
-                    else:
-                        postings_list = self.get_postings_list(dictionary, token[0])
+            for token in list_of_tokens:
 
-                    self.add_to_postings_list(postings_list, token[1])
-            except StopIteration:
-                print("Done iterating through tokens. SPIMI inversion complete.")
-                iteration_complete = True
+                if token[0] not in dictionary:
+                    postings_list = self.add_to_dictionary(dictionary, token[0])
+                else:
+                    postings_list = self.get_postings_list(dictionary, token[0])
+
+                self.add_to_postings_list(postings_list, token[1])
 
             self.block_number += 1
             terms = self.sort_terms(dictionary)
