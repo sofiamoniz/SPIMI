@@ -11,8 +11,7 @@ class SPIMI:
     def __init__(
             self,
             reuters,
-            output_directory="DISK", output_index="index",
-            block_prefix="BLOCK"
+            output_directory="DISK", block_prefix="BLOCK", output_index="index"
     ):
         """
         Initiate the SPIMI inverter with a list of tokens.

@@ -15,7 +15,7 @@ from definitions import ROOT_DIR
 
 class Reuters:
 
-    def __init__(self, docs_per_block=500, number_of_files=22,
+    def __init__(self, number_of_files=22, docs_per_block=500,
                  remove_stopwords=False, stem=False, case_folding=False, remove_numbers=False
     ):
         """
@@ -82,7 +82,7 @@ class Reuters:
         For each file:
             - Find all REUTERS tags, each representing a document.
             - For each document, get its document ID (NEWID attribute).
-            - If BODY tag is present, get tuples of (term, document ID) from its text, which represent tokens.
+            - Get tuples of (term, document ID) from the content in a document's TEXT tag, which represent tokens.
 
         :return: list of lists of tokens (tuples of (term, postings list)). Yes, list of lists of. It's a list of lists.
         Each list in the list represents a block that will be generated.
@@ -105,27 +105,26 @@ class Reuters:
             for document in documents:
                 document_id = int(document['newid'])
 
-                if document.body:
-                    body = document.body.text
-                    terms = word_tokenize(body)
-                    if self.will_compress:
-                        terms = self.compress(terms)
-                    token_pairs = [(term, document_id) for term in terms]
-                    tokens.extend(token_pairs)
-                    number_of_documents += 1
+                content = document.find("text").text
+                terms = word_tokenize(content)
+                if self.will_compress:
+                    terms = self.compress(terms)
+                token_pairs = [(term, document_id) for term in terms]
+                tokens.extend(token_pairs)
+                number_of_documents += 1
 
-                    current_document += 1
-                    if current_document == self.docs_per_block:
-                        number_of_tokens += len(tokens)
-                        self.list_of_lists_of_tokens.append(tokens)
-                        tokens = []
-                        current_document = 0
+                current_document += 1
+                if current_document == self.docs_per_block:
+                    number_of_tokens += len(tokens)
+                    self.list_of_lists_of_tokens.append(tokens)
+                    tokens = []
+                    current_document = 0
 
         if tokens:
             number_of_tokens += len(tokens)
             self.list_of_lists_of_tokens.append(tokens)
 
-        print("Found %s documents with bodies and %s tokens." % ("{:,}".format(number_of_documents), "{:,}".format(number_of_tokens)))
+        print("Found %s documents and %s tokens." % ("{:,}".format(number_of_documents), "{:,}".format(number_of_tokens)))
         return self.list_of_lists_of_tokens
 
     def compress(self, terms):

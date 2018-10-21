@@ -34,6 +34,12 @@ The arguments are the following:
 
 - **Vartan Benohanian** - *ID:* 27492049
 
+## Report
+
+A project report showcasing a more detailed description of the project is available [here](Project%20Report.pdf).
+
+The Expectations of Originality form is available [here](Expectations%20of%20Originality.pdf).
+
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details.

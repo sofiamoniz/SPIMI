@@ -122,12 +122,12 @@ class CompressionTable:
         return ["stemmed", "{:,}".format(len(self.terms_stemmed)), reduction_from_previous, total_reduction]
 
     @staticmethod
-    def get_reduction_percentage(bigger_index, smaller_index):
+    def get_reduction_percentage(previous, current):
         """
         Get difference in size between 2 indexes.
-        :param bigger_index: index containing the larger amount of terms.
-        :param smaller_index: index containing the smaller amount of terms.
+        :param previous: previous index.
+        :param current: current index.
         :return: difference in size between both indexes, given in percentage (%), rounded to nearest 2 decimals.
         """
-        reduction_percentage = (len(bigger_index) - len(smaller_index))/len(bigger_index) * 100
+        reduction_percentage = (len(current) - len(previous))/len(previous) * 100
         return "{0:.2f}".format(reduction_percentage)

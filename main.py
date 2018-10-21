@@ -33,8 +33,7 @@ if __name__ == '__main__':
 
     spimi = SPIMI(
         reuters=reuters,
-        output_directory="DISK", output_index="index",
-        block_prefix="BLOCK"
+        output_directory="DISK", block_prefix="BLOCK", output_index="index",
     )
 
     index = spimi.construct_index()
