@@ -48,6 +48,7 @@ class CompressionTable:
         self.table.append_row(self.get_case_folding())
         self.table.append_row(self.get_without_30_stopwords())
         self.table.append_row(self.get_without_150_stopwords())
+        self.table.append_row(self.get_stemmed())
         return self.table
 
     def get_unfiltered(self):
@@ -113,7 +114,12 @@ class CompressionTable:
         Stem all terms.
         :return: row featuring information on index with all terms stemmed.
         """
-        self.terms_stemmed = {term for term in self.terms_remove_150_stopwords}
+        self.terms_stemmed = list(set([self.ps.stem(term) for term in self.terms_remove_150_stopwords]))
+
+        reduction_from_previous = self.get_reduction_percentage(self.terms_remove_150_stopwords, self.terms_stemmed)
+        total_reduction = self.get_reduction_percentage(self.terms, self.terms_stemmed)
+
+        return ["stemmed", "{:,}".format(len(self.terms_stemmed)), reduction_from_previous, total_reduction]
 
     @staticmethod
     def get_reduction_percentage(bigger_index, smaller_index):
