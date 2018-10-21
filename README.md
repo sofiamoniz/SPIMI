@@ -15,15 +15,20 @@ The following Python packages are required to run the program:
 
 ### Running
 
-`python3 main.py [-mb MAX_BLOCK_SIZE] [-rs] [-s] [-c] [-rn]`
+```
+python3 main.py [-docs DOCS_PER_BLOCK]
+                [-r {1, 2, 3, ..., 22}]
+                [-rs] [-s] [-c] [-rn]
+```
 
 The arguments are the following:
 
-1. `-mb` or `--max-block-size`: the max size of a block file, in megabytes.
-2. `-rs` or `--remove-stopwords`: stopwords will be removed from index.
-3. `-s` or `--stem`: terms in index will be stemmed.
-4. `-c` or `--case-folding`: terms in index will be converted to lowercase.
-5. `-rn` or `--remove-numbers`: terms that are just numbers will be removed from index.
+1. `-docs` or `--docs-per-block`: number of documents per block. Default is 500.
+2. `-r` or `--reuters`: number of Reuters files to parse, choice from 1 to 22. Default is 22.
+3. `-rs` or `--remove-stopwords`: stopwords will be removed from index. Default is false.
+4. `-s` or `--stem`: terms in index will be stemmed. Default is false.
+5. `-c` or `--case-folding`: terms in index will be converted to lowercase. Default is false.
+6. `-rn` or `--remove-numbers`: terms that are just numbers will be removed from index. Default is false.
 
 ## Author
 
@@ -31,4 +36,4 @@ The arguments are the following:
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
+This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details.

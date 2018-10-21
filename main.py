@@ -10,7 +10,8 @@ import argparse
 
 parser = argparse.ArgumentParser(description="Configure Reuters parser and set block size limit.")
 
-parser.add_argument("-mb", "--max-block-size", type=float, help="max block size", default=1)
+parser.add_argument("-docs", "--docs-per-block", type=int, help="documents per block", default=500)
+parser.add_argument("-r", "--reuters", type=int, help="number of Reuters files to parse", choices=range(1, 23), default=22)
 parser.add_argument("-rs", "--remove-stopwords", action="store_true", help="remove stopwords", default=False)
 parser.add_argument("-s", "--stem", action="store_true", help="stem terms", default=False)
 parser.add_argument("-c", "--case-folding", action="store_true", help="use case folding", default=False)
@@ -22,6 +23,8 @@ args = parser.parse_args()
 if __name__ == '__main__':
 
     reuters = Reuters(
+        number_of_files=args.reuters,
+        docs_per_block=args.docs_per_block,
         remove_stopwords=args.remove_stopwords,
         stem=args.stem,
         case_folding=args.case_folding,
@@ -31,7 +34,7 @@ if __name__ == '__main__':
     spimi = SPIMI(
         reuters=reuters,
         output_directory="DISK", output_index="index",
-        block_prefix="BLOCK", max_block_size=args.max_block_size
+        block_prefix="BLOCK"
     )
 
     index = spimi.construct_index()

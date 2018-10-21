@@ -15,9 +15,12 @@ from definitions import ROOT_DIR
 
 class Reuters:
 
-    def __init__(self, remove_stopwords=False, stem=False, case_folding=False, remove_numbers=False):
+    def __init__(self, docs_per_block=500, number_of_files=22,
+                 remove_stopwords=False, stem=False, case_folding=False, remove_numbers=False
+    ):
         """
         Initiate the Reuters objects which will contain the reuters files.
+        :param docs_per_block: number of documents per generated block.
         :param remove_stopwords: will we include stopwords?
         :param stem: will we stem the terms?
         :param case_folding: will we lower terms to their lowercase variant?
@@ -26,7 +29,9 @@ class Reuters:
         self.reuters_url = "http://www.daviddlewis.com/resources/testcollections/reuters21578/reuters21578.tar.gz"
         self.reuters_directory = "/".join([ROOT_DIR, "reuters21578"])
 
-        self.reuters_files = self.__init_reuters_files()[:1]
+        self.reuters_files = self.__init_reuters_files()[:number_of_files]
+
+        self.docs_per_block = docs_per_block
 
         self.remove_stopwords = remove_stopwords
         self.stem = stem
@@ -40,6 +45,8 @@ class Reuters:
 
         if self.stem:
             self.ps = PorterStemmer()
+
+        self.list_of_lists_of_tokens = []
 
     def get_reuters(self):
         """
@@ -77,12 +84,13 @@ class Reuters:
             - For each document, get its document ID (NEWID attribute).
             - If BODY tag is present, get tuples of (term, document ID) from its text, which represent tokens.
 
-        We shall also remove stopwords and/or stem the words, if the parameters indicate to do so.
-
-        :return: list of tokens (tuples of (term, postings list)).
+        :return: list of lists of tokens (tuples of (term, postings list)). Yes, list of lists of. It's a list of lists.
+        Each list in the list represents a block that will be generated.
         """
         tokens = []
+        current_document = 0
         number_of_documents = 0
+        number_of_tokens = 0
         print("Parsing Reuters files...")
 
         for file in self.reuters_files:
@@ -106,8 +114,19 @@ class Reuters:
                     tokens.extend(token_pairs)
                     number_of_documents += 1
 
-        print("Found %s documents with bodies and %s tokens." % ("{:,}".format(number_of_documents), "{:,}".format(len(tokens))))
-        return tokens
+                    current_document += 1
+                    if current_document == self.docs_per_block:
+                        number_of_tokens += len(tokens)
+                        self.list_of_lists_of_tokens.append(tokens)
+                        tokens = []
+                        current_document = 0
+
+        if tokens:
+            number_of_tokens += len(tokens)
+            self.list_of_lists_of_tokens.append(tokens)
+
+        print("Found %s documents with bodies and %s tokens." % ("{:,}".format(number_of_documents), "{:,}".format(number_of_tokens)))
+        return self.list_of_lists_of_tokens
 
     def compress(self, terms):
         """
