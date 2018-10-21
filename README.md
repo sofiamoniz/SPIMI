@@ -15,7 +15,11 @@ The following Python packages are required to run the program:
 
 ### Running
 
-`python3 main.py [-mb MAX_BLOCK_SIZE] [-rs] [-s] [-c] [-rn]`
+```
+python3 main.py [-docs DOCS_PER_BLOCK]
+                [-r {1, 2, 3, ..., 22}]
+                [-rs] [-s] [-c] [-rn]
+```
 
 The arguments are the following:
 
@@ -32,4 +36,4 @@ The arguments are the following:
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
+This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details.
