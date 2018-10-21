@@ -4,6 +4,7 @@
 from reuters import Reuters
 from spimi import SPIMI
 from query import Query, AndQuery, OrQuery
+from compression_table import CompressionTable
 import argparse
 
 
@@ -41,3 +42,8 @@ if __name__ == '__main__':
     AndQuery(index, "and you").execute()
     Query(index, "wale").execute()
     AndQuery(index, "hard").execute()
+
+    if args.remove_stopwords or args.stem or args.case_folding or args.remove_numbers:
+        print("Your index has already been compressed, will use that as unfiltered.")
+        table = CompressionTable(index)
+        print(table.generate_table())

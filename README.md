@@ -20,7 +20,7 @@ The following Python packages are required to run the program:
 The arguments are the following:
 
 1. `-mb` or `--max-block-size`: the max size of a block file, in megabytes.
-2. `-rs` or `--remove-stopwords`: stopwords will be removes from index.
+2. `-rs` or `--remove-stopwords`: stopwords will be removed from index.
 3. `-s` or `--stem`: terms in index will be stemmed.
 4. `-c` or `--case-folding`: terms in index will be converted to lowercase.
 5. `-rn` or `--remove-numbers`: terms that are just numbers will be removed from index.

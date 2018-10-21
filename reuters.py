@@ -122,7 +122,7 @@ class Reuters:
         if self.stem:
             terms = [self.ps.stem(term) for term in terms]
         if self.case_folding:
-            terms = [term.lower() for term in terms]
+            terms = [term.casefold() for term in terms]
         if self.remove_numbers:
             terms = [term for term in terms if not term.replace(",", "").replace(".", "").isdigit()]
 
