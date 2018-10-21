@@ -76,8 +76,14 @@ class OrQuery(Query):
 
     def execute(self):
         """
-        Get postings lists and conduct their union.
-        :return: postings list for a query using disjunction (or).
+        We get a list of postings lists at first.
+        We want to make a flat list from each one of these lists.
+
+        We want to eliminate duplicates, but by keeping the postings that appear the most often at the beginning of the
+        list. We do this by initializing an empty set, and seeing which elements of the postings list appears the most.
+        If it's not in the set, we add it. We repeat until there are no more elements in the initial list to go over.
+
+        :return: postings list for a query, with postings matching the most query terms are the beginning of the list.
         """
         postings_lists = self.get_postings_lists()
         postings_lists = [posting for postings_list in postings_lists for posting in postings_list]
