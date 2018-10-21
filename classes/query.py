@@ -84,3 +84,9 @@ class OrQuery(Query):
 
         self.print_results(results)
         return results
+
+
+def ask_user():
+    query = input("Type in a search query.\n")
+    print()
+    return query
