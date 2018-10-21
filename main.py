@@ -1,10 +1,10 @@
 #! /usr/bin/env python3
 # coding: utf-8
 
-from reuters import Reuters
-from spimi import SPIMI
-from query import Query, AndQuery, OrQuery
-from compression_table import CompressionTable
+from classes.reuters import Reuters
+from classes.spimi import SPIMI
+from classes.query import Query, AndQuery, OrQuery
+from classes.compression_table import CompressionTable
 import argparse
 
 
