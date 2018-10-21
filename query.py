@@ -49,7 +49,7 @@ class Query:
         :param results: list of postings.
         """
         print("%s: %s" % (self.__class__.__name__, " ".join(self.terms)))
-        print("%d result(s) found: %s\n" % ("{:,}".format(len(results)), ", ".join(map(str, results)) if len(results) > 0 else "there are no results matching your query."))
+        print("%s result(s) found: %s\n" % ("{:,}".format(len(results)), ", ".join(map(str, results)) if len(results) > 0 else "there are no results matching your query."))
 
 
 class AndQuery(Query):
