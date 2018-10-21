@@ -25,9 +25,9 @@ class Query:
 
         for term in self.terms:
             try:
-                results[term] = set(self.index[term])
+                results[term] = self.index[term]
             except KeyError:
-                results[term] = set()
+                results[term] = []
 
         return list(results.values())
 
@@ -63,7 +63,7 @@ class AndQuery(Query):
         :return: postings list for a query using conjunction (and).
         """
         postings_lists = self.get_postings_lists()
-        results = sorted(postings_lists[0].intersection(*[postings_list for postings_list in postings_lists[1:]]))
+        results = sorted(set(postings_lists[0]).intersection(*[set(postings_list) for postings_list in postings_lists[1:]]))
 
         self.print_results(results)
         return results
@@ -80,7 +80,12 @@ class OrQuery(Query):
         :return: postings list for a query using disjunction (or).
         """
         postings_lists = self.get_postings_lists()
-        results = sorted(postings_lists[0].union(*[postings_list for postings_list in postings_lists[1:]]))
+        postings_lists = [posting for postings_list in postings_lists for posting in postings_list]
+
+        postings_lists_set = set()
+        postings_lists_set_add = postings_lists_set.add
+
+        results = [posting for posting in sorted(postings_lists, key=postings_lists.count, reverse=True) if not (posting in postings_lists_set or postings_lists_set_add(posting))]
 
         self.print_results(results)
         return results
