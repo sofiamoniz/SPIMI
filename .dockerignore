@@ -7,3 +7,7 @@ LICENSE.md
 README.md
 Dockerfile
 .dockerignore
+__pycache__
+classes/__pycache__
+DISK*
+reuters21578
