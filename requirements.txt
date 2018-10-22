@@ -1,0 +1,4 @@
+bs4==0.0.1
+wget==3.2
+nltk==3.3
+beautifultable==0.5.3

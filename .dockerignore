@@ -1,0 +1,9 @@
+.idea
+venv
+Project Report*
+Expectations of Originality*
+.git*
+LICENSE.md
+README.md
+Dockerfile
+.dockerignore
