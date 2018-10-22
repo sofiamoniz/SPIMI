@@ -5,9 +5,8 @@ from classes.reuters import Reuters
 from classes.spimi import SPIMI
 from classes.query import Query, AndQuery, OrQuery, ask_user
 from classes.compression_table import CompressionTable
-import argparse
 
-from time import time
+import argparse
 from nltk.stem import PorterStemmer
 
 
@@ -41,13 +40,18 @@ parser.add_argument("-rs", "--remove-stopwords", action="store_true", help="remo
 parser.add_argument("-s", "--stem", action="store_true", help="stem terms", default=False)
 parser.add_argument("-c", "--case-folding", action="store_true", help="use case folding", default=False)
 parser.add_argument("-rn", "--remove-numbers", action="store_true", help="remove numbers", default=False)
+parser.add_argument("-a", "--all", action="store_true", help="use all compression techniques", default=False)
 
 args = parser.parse_args()
 
 
 if __name__ == '__main__':
 
-    start = time()
+    if args.all:
+        args.remove_stopwords = True
+        args.stem = True
+        args.case_folding = True
+        args.remove_numbers = True
 
     reuters = Reuters(
         number_of_files=args.reuters,
@@ -58,18 +62,9 @@ if __name__ == '__main__':
         remove_numbers=args.remove_numbers
     )
 
-    spimi = SPIMI(
-        reuters=reuters,
-        output_directory="DISK", block_prefix="BLOCK", output_index="index",
-    )
-
-    tokenize = time()
-    print("%s seconds to tokenize." % "{0:.3f}".format((tokenize - start)))
+    spimi = SPIMI(reuters=reuters)
 
     index = spimi.construct_index()
-
-    construct_index = time()
-    print("%s seconds to construct inverted index." % "{0:.3f}".format((construct_index - tokenize)))
 
     if args.remove_stopwords or args.stem or args.case_folding or args.remove_numbers:
         print("Your index has already been compressed, will use that as unfiltered.")
@@ -77,11 +72,6 @@ if __name__ == '__main__':
     table = CompressionTable(index)
     print(table.generate_table())
     print()
-
-    generate_table = time()
-    print("%s seconds to generate statistics table." % "{0:.3f}".format((generate_table - construct_index)))
-
-    print("%s seconds to completion.\n" % "{0:.3f}".format((time() - start)))
 
     """
     Stemming every term in the index so that it's easy to compare them in queries.

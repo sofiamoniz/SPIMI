@@ -8,26 +8,22 @@ from definitions import ROOT_DIR
 
 class SPIMI:
 
-    def __init__(
-            self,
-            reuters,
-            output_directory="DISK", block_prefix="BLOCK", output_index="index"
-    ):
+    def __init__(self, reuters):
         """
         Initiate the SPIMI inverter with a list of tokens.
         :param reuters: Reuters object which will contain reuters files and methods to obtain tokens.
-        :param output_directory: directory in which merge blocks and index file will be stored.
-        :param output_index: name of index file which will be generated and placed in output directory.
-        :param block_prefix: prefix of block files which will be generated and placed in output directory.
         """
         self.reuters = reuters
-        self.output_directory = "/".join([ROOT_DIR, output_directory])
 
-        self.block_prefix = block_prefix
+        self.output_directory = "DISK"
+        self.output_directory = "/".join([ROOT_DIR, self.output_directory])
+
+        self.block_prefix = "BLOCK"
         self.block_number = 0
         self.block_suffix = ".txt"
 
-        self.output_index = "/".join([self.output_directory, output_index + self.block_suffix])
+        self.output_index = "index"
+        self.output_index = "/".join([self.output_directory, self.output_index + self.block_suffix])
         self.mkdir_output_directory(self.output_directory)
 
         self.list_of_lists_of_tokens = self.reuters.get_tokens()
@@ -135,11 +131,6 @@ class SPIMI:
             block_file = "/".join([self.output_directory, "".join([self.block_prefix, str(self.block_number), self.block_suffix])])
             block_files.append(self.write_block_to_output_directory(terms, dictionary, block_file))
 
-        if self.block_number == 1:
-            print("%d block file has been generated." % self.block_number)
-        else:
-            print("%d block files have been generated." % self.block_number)
-
         return self.merge_blocks(block_files)
 
     def merge_blocks(self, block_files):
@@ -205,7 +196,6 @@ class SPIMI:
 
             output_index.close()
 
-        print("Merge complete. The merged index can be found at %s.\n" % self.output_index)
         return self.get_index()
 
     def get_index(self):
