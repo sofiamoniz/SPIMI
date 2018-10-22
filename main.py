@@ -18,7 +18,7 @@ def stem_index(index):
 
     :param index: dictionary containing terms and the postings in which they appear.
 
-    :return: index with all keys converted to lowercase, making sure the postings combine as well. For example:
+    :return: index with all keys stemmed, making sure the postings combine as well. For example:
     {'hello': [1, 2], 'Hello': [1, 3], 'HELLO': [2, 3, 5]} would return a dictionary of: {'hello': [1, 2, 3, 5]}.
     """
     new_index = {}
@@ -32,10 +32,10 @@ def stem_index(index):
     return new_index
 
 
-parser = argparse.ArgumentParser(description="Configure Reuters parser and set block size limit.")
+parser = argparse.ArgumentParser(description="Configure Reuters parser and set document limit per block.")
 
 parser.add_argument("-docs", "--docs-per-block", type=int, help="documents per block", default=500)
-parser.add_argument("-r", "--reuters", type=int, help="number of Reuters files to parse", choices=range(1, 23), default=22)
+parser.add_argument("-r", "--reuters", type=int, help="number of Reuters files to parse, choice from 1 to 22", choices=range(1, 23), default=22)
 parser.add_argument("-rs", "--remove-stopwords", action="store_true", help="remove stopwords", default=False)
 parser.add_argument("-s", "--stem", action="store_true", help="stem terms", default=False)
 parser.add_argument("-c", "--case-folding", action="store_true", help="use case folding", default=False)
@@ -81,8 +81,14 @@ if __name__ == '__main__':
     if not args.stem:
         index = stem_index(index)
 
+    """
+    Allow user to conduct queries.
+    First, ask if they want AND or OR query.
+    Then, prompt them for the desired query.
+    After outputting results, repeat.
+    """
     while True:
-        user_input = input("Would you like to conduct an AND query or an OR query? Hit enter to end the program. ")
+        user_input = input("Would you like to conduct an AND query or an OR query? Hit enter to end the program. [and/or] ")
         if user_input == "":
             break
         elif user_input.lower() in ["and", "or"]:
