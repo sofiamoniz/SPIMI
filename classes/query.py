@@ -3,6 +3,7 @@
 
 import abc
 from nltk.stem import PorterStemmer
+from nltk.tokenize import word_tokenize
 
 
 class Query:
@@ -16,7 +17,7 @@ class Query:
         self.index = index
         self.ps = PorterStemmer()
         self.original_terms = terms.split()
-        self.terms = [self.ps.stem(term) for term in terms.split()]
+        self.terms = [self.ps.stem(term) for term in word_tokenize(terms)]
 
     def get_postings_lists(self):
         """
