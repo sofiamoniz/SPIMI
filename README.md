@@ -60,8 +60,7 @@ The arguments are the following:
 4. `-s` or `--stem`: terms in index will be stemmed. Default is false.
 5. `-c` or `--case-folding`: terms in index will be converted to lowercase. Default is false.
 6. `-rn` or `--remove-numbers`: terms that are just numbers will be removed from index. Default is false.
-
-You can substitute the last 4 by just specifying `-a` or `--all`.
+7. `-a` or `--all`: includes options 3 to 6. Default is false.
 
 ## Author
 
