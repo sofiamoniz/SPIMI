@@ -124,7 +124,7 @@ class Reuters:
             number_of_tokens += len(tokens)
             self.list_of_lists_of_tokens.append(tokens)
 
-        print("Found %s documents and %s tokens. %d block file(s) generated.\n"
+        print("Found %s documents and %s tokens. %d block file(s) will be generated.\n"
               % ("{:,}".format(number_of_documents), "{:,}".format(number_of_tokens), len(self.list_of_lists_of_tokens)))
         return self.list_of_lists_of_tokens
 

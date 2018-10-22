@@ -34,7 +34,7 @@ def stem_index(index):
 
 parser = argparse.ArgumentParser(description="Configure Reuters parser and set document limit per block.")
 
-parser.add_argument("-docs", "--docs-per-block", type=int, help="documents per block", default=500)
+parser.add_argument("-d", "--docs", type=int, help="documents per block", default=500)
 parser.add_argument("-r", "--reuters", type=int, help="number of Reuters files to parse, choice from 1 to 22", choices=range(1, 23), default=22)
 parser.add_argument("-rs", "--remove-stopwords", action="store_true", help="remove stopwords", default=False)
 parser.add_argument("-s", "--stem", action="store_true", help="stem terms", default=False)
@@ -55,7 +55,7 @@ if __name__ == '__main__':
 
     reuters = Reuters(
         number_of_files=args.reuters,
-        docs_per_block=args.docs_per_block,
+        docs_per_block=args.docs,
         remove_stopwords=args.remove_stopwords,
         stem=args.stem,
         case_folding=args.case_folding,

@@ -47,14 +47,15 @@ There are so many ways to do this.
 ### Running
 
 ```
-python3 main.py [-docs DOCS_PER_BLOCK]
+python3 main.py [-d DOCS_PER_BLOCK]
                 [-r {1, 2, 3, ..., 22}]
                 [-rs] [-s] [-c] [-rn]
+                [-a]
 ```
 
 The arguments are the following:
 
-1. `-docs` or `--docs-per-block`: number of documents per block. Default is 500.
+1. `-d` or `--docs`: number of documents per block. Default is 500.
 2. `-r` or `--reuters`: number of Reuters files to parse, choice from 1 to 22. Default is 22.
 3. `-rs` or `--remove-stopwords`: stopwords will be removed from index. Default is false.
 4. `-s` or `--stem`: terms in index will be stemmed. Default is false.
