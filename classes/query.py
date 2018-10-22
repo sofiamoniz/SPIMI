@@ -2,6 +2,7 @@
 # coding: utf-8
 
 import abc
+from nltk.stem import PorterStemmer
 
 
 class Query:
@@ -10,10 +11,12 @@ class Query:
         """
         Query constructor.
         :param index: dictionary with terms as keys, and their postings list as values.
-        :param terms: query which will be conducted
+        :param terms: query which will be conducted, all stemmed
         """
         self.index = index
-        self.terms = terms.split()
+        self.ps = PorterStemmer()
+        self.original_terms = terms.split()
+        self.terms = [self.ps.stem(term) for term in terms.split()]
 
     def get_postings_lists(self):
         """
@@ -48,6 +51,7 @@ class Query:
         Print out terms in the query, and the postings found.
         :param results: list of postings.
         """
+        print("%s (original query): %s" % (self.__class__.__name__, " ".join(self.original_terms)))
         print("%s: %s" % (self.__class__.__name__, " ".join(self.terms)))
         print("%s result(s) found: %s\n" % ("{:,}".format(len(results)), ", ".join(map(str, results)) if len(results) > 0 else "there are no results matching your query."))
 
@@ -88,10 +92,12 @@ class OrQuery(Query):
         postings_lists = self.get_postings_lists()
         postings_lists = [posting for postings_list in postings_lists for posting in postings_list]
 
+        postings_lists = sorted(postings_lists, key=lambda x: (postings_lists.count(x), -x), reverse=True)
+
         postings_lists_set = set()
         postings_lists_set_add = postings_lists_set.add
 
-        results = [posting for posting in sorted(postings_lists, key=postings_lists.count, reverse=True) if not (posting in postings_lists_set or postings_lists_set_add(posting))]
+        results = [posting for posting in postings_lists if not (posting in postings_lists_set or postings_lists_set_add(posting))]
 
         self.print_results(results)
         return results
