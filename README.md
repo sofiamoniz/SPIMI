@@ -1,4 +1,6 @@
-# COMP 479 - Project 1
+# Single-Pass In-Memory Indexing
+
+This repository was made public on October 23, 2018.
 
 This is a project done for the fall 2018 COMP 479 - Information Retrieval course in Concordia University. The goal of the project was to analyze Reuters documents from a bunch of files by tokenizing the documents, subsequently constructing an index containing terms and their corresponding postings lists.
 
