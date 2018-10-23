@@ -1,16 +1,12 @@
 #! /usr/bin/env python3
 # coding: utf-8
 
-from nltk.tokenize import word_tokenize
-from nltk.corpus import stopwords
-from nltk.stem import PorterStemmer
-
 import os
 import wget
 import tarfile
 from bs4 import BeautifulSoup
 
-from definitions import ROOT_DIR
+from definitions import ROOT_DIR, word_tokenize, stopwords, ps
 
 
 class Reuters:
@@ -20,6 +16,7 @@ class Reuters:
     ):
         """
         Initiate the Reuters objects which will contain the reuters files.
+        :param number_of_files: number of Reuters files that will be parsed.
         :param docs_per_block: number of documents per generated block.
         :param remove_stopwords: will we include stopwords?
         :param stem: will we stem the terms?
@@ -39,12 +36,6 @@ class Reuters:
         self.remove_numbers = remove_numbers
 
         self.will_compress = self.remove_stopwords or self.stem or self.case_folding or self.remove_numbers
-
-        if self.remove_stopwords:
-            self.stopwords = set(stopwords.words("english"))
-
-        if self.stem:
-            self.ps = PorterStemmer()
 
         self.list_of_lists_of_tokens = []
 
@@ -137,9 +128,9 @@ class Reuters:
         :return: compressed list of terms.
         """
         if self.remove_stopwords:
-            terms = [term for term in terms if term.lower() not in self.stopwords]
+            terms = [term for term in terms if term.lower() not in stopwords]
         if self.stem:
-            terms = [self.ps.stem(term) for term in terms]
+            terms = [ps.stem(term) for term in terms]
         if self.case_folding:
             terms = [term.casefold() for term in terms]
         if self.remove_numbers:

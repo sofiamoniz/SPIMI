@@ -2,8 +2,8 @@
 # coding: utf-8
 
 import abc
-from nltk.stem import PorterStemmer
-from nltk.tokenize import word_tokenize
+
+from definitions import word_tokenize, ps
 
 
 class Query:
@@ -15,9 +15,14 @@ class Query:
         :param terms: query which will be conducted, all stemmed
         """
         self.index = index
-        self.ps = PorterStemmer()
         self.original_terms = terms.split()
-        self.terms = [self.ps.stem(term) for term in word_tokenize(terms)]
+        self.terms = [ps.stem(term) for term in word_tokenize(terms)]
+
+    @staticmethod
+    def ask_user():
+        query = input("Type in a search query.\n")
+        print()
+        return query
 
     def get_postings_lists(self):
         """
@@ -52,8 +57,8 @@ class Query:
         Print out terms in the query, and the postings found.
         :param results: list of postings.
         """
-        print("%s (original query): %s" % (self.__class__.__name__, " ".join(self.original_terms)))
-        print("%s: %s" % (self.__class__.__name__, " ".join(self.terms)))
+        print("%s (original): %s" % (self.__class__.__name__, " ".join(self.original_terms)))
+        print("%s (stemmed): %s" % (self.__class__.__name__, " ".join(self.terms)))
         print("%s result(s) found: %s\n" % ("{:,}".format(len(results)), ", ".join(map(str, results)) if len(results) > 0 else "there are no results matching your query."))
 
 
@@ -102,9 +107,3 @@ class OrQuery(Query):
 
         self.print_results(results)
         return results
-
-
-def ask_user():
-    query = input("Type in a search query.\n")
-    print()
-    return query

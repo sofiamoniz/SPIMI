@@ -1,13 +1,13 @@
 #! /usr/bin/env python3
 # coding: utf-8
 
+from definitions import ps
 from classes.reuters import Reuters
 from classes.spimi import SPIMI
-from classes.query import Query, AndQuery, OrQuery, ask_user
+from classes.query import Query, AndQuery, OrQuery
 from classes.compression_table import CompressionTable
 
 import argparse
-from nltk.stem import PorterStemmer
 
 
 def stem_index(index):
@@ -22,7 +22,6 @@ def stem_index(index):
     {'hello': [1, 2], 'Hello': [1, 3], 'HELLO': [2, 3, 5]} would return a dictionary of: {'hello': [1, 2, 3, 5]}.
     """
     new_index = {}
-    ps = PorterStemmer()
     for k, v in index.items():
         if ps.stem(k) not in new_index.keys():
             new_index[ps.stem(k)] = index[k]
@@ -53,6 +52,9 @@ if __name__ == '__main__':
         args.case_folding = True
         args.remove_numbers = True
 
+    """
+    Upon initialization, downloads Reuters files if they're not downloaded, and stores them in a list.
+    """
     reuters = Reuters(
         number_of_files=args.reuters,
         docs_per_block=args.docs,
@@ -62,6 +64,10 @@ if __name__ == '__main__':
         remove_numbers=args.remove_numbers
     )
 
+    """
+    Upon initialization, makes the Reuters object tokenize the files mentioned above, and stores them in a variable.
+    Also creates the output directory if it hasn't been initialized.
+    """
     spimi = SPIMI(reuters=reuters)
 
     index = spimi.construct_index()
@@ -92,7 +98,7 @@ if __name__ == '__main__':
         if user_input == "":
             break
         elif user_input.lower() in ["and", "or"]:
-            user_query = ask_user()
+            user_query = Query.ask_user()
             if user_input.lower() == "and":
                 AndQuery(index, user_query).execute()
             elif user_input.lower() == "or":

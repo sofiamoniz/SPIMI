@@ -2,8 +2,7 @@
 # coding: utf-8
 
 from beautifultable import BeautifulTable
-from nltk.corpus import stopwords
-from nltk.stem import PorterStemmer
+from definitions import stopwords, ps
 
 import random
 
@@ -28,12 +27,9 @@ class CompressionTable:
         self.terms_remove_150_stopwords = []
         self.terms_stemmed = []
 
-        self.stopwords = set(stopwords.words("english"))
-        self.stopwords = random.sample(self.stopwords, 150)
+        self.stopwords = random.sample(stopwords, 150)
         self.stopwords_30 = list(self.stopwords)[:30]
-        self.stopwords_150 = list(self.stopwords)[:150]
-
-        self.ps = PorterStemmer()
+        self.stopwords_150 = list(self.stopwords)
 
         self.table = BeautifulTable()
         self.table.column_headers = ["", "# distinct terms", "∆ % from previous", "∆ % from unfiltered"]
@@ -114,7 +110,7 @@ class CompressionTable:
         Stem all terms.
         :return: row featuring information on index with all terms stemmed.
         """
-        self.terms_stemmed = list(set([self.ps.stem(term) for term in self.terms_remove_150_stopwords]))
+        self.terms_stemmed = list(set([ps.stem(term) for term in self.terms_remove_150_stopwords]))
 
         reduction_from_previous = self.get_reduction_percentage(self.terms_remove_150_stopwords, self.terms_stemmed)
         total_reduction = self.get_reduction_percentage(self.terms, self.terms_stemmed)

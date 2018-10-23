@@ -81,17 +81,17 @@ class SPIMI:
         return [term for term in sorted(dictionary)]
 
     @staticmethod
-    def write_block_to_output_directory(terms, dictionary, block_file):
+    def write_block_to_output_directory(sorted_terms, dictionary, block_file):
         """
         Create BLOCK*.txt file(s) in the output directory.
         The text file(s) will contain terms, with the document IDs in which they appear.
-        :param terms: list of SORTED terms.
+        :param terms: list of sorted terms.
         :param dictionary: dictionary containing terms as keys, and their corresponding list of postings as values.
         :param block_file: file in which data will be written.
         :return:
         """
         with open(block_file, 'w') as file:
-            for term in terms:
+            for term in sorted_terms:
                 line = "%s %s\n" % (term, ' '.join([str(document_id) for document_id in dictionary[term]]))
                 file.write(line)
         return block_file
@@ -180,12 +180,14 @@ class SPIMI:
 
                 min_index = lines.index(min(lines))
                 line = lines[min_index]
+                current_term = line.split()[0]
+                current_postings = " ".join(map(str, sorted(set(map(int, line.split()[1:])))))
 
-                if line.split()[0] != most_recent_term:
-                    output_index.write("\n%s" % line)
-                    most_recent_term = line.split()[0]
+                if current_term != most_recent_term:
+                    output_index.write("\n%s %s" % (current_term, current_postings))
+                    most_recent_term = current_term
                 else:
-                    output_index.write(" %s" % " ".join(line.split()[1:]))
+                    output_index.write(" %s" % current_postings)
 
                 lines[min_index] = block_files[min_index].readline()[:-1]
 
@@ -222,6 +224,6 @@ class SPIMI:
 
         for line in index_file:
             line = line.split()
-            inverted_index[line[0]] = sorted(set(map(int, line[1:])))
+            inverted_index[line[0]] = sorted(map(int, (line[1:])))
 
         return inverted_index
