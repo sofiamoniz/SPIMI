@@ -1,7 +1,5 @@
 # Single-Pass In-Memory Indexing
 
-This repository was made public on October 23, 2018.
-
 This is a project done for the fall 2018 COMP 479 - Information Retrieval course in Concordia University. The goal of the project was to analyze Reuters documents from a bunch of files by tokenizing the documents, subsequently constructing an index containing terms and their corresponding postings lists.
 
 The Reuters files can be downloaded [here](http://www.daviddlewis.com/resources/testcollections/reuters21578/), though the program will download them for you once run (if they're not already available in the root directory of the project).
@@ -48,6 +46,8 @@ There are so many ways to do this.
 
 ### Running
 
+The file to run is in the `src/` directory.
+
 ```
 python3 main.py [-d DOCS_PER_BLOCK]
                 [-r {1, 2, 3, ..., 22}]
@@ -64,6 +64,8 @@ The arguments are the following:
 5. `-c` or `--case-folding`: terms in index will be converted to lowercase. Default is false.
 6. `-rn` or `--remove-numbers`: terms that are just numbers will be removed from index. Default is false.
 7. `-a` or `--all`: includes options 3 to 6. Default is false.
+
+Generated files will appear in the root directory of the repository.
 
 ## Author
 

@@ -1,13 +1,10 @@
-.idea
-venv
-Project Report*
-Expectations of Originality*
-.git*
-LICENSE.md
-README.md
-Dockerfile
-.dockerignore
-__pycache__
-classes/__pycache__
-DISK*
-reuters21578
+# Ignore everything
+**
+
+# Allow files and directories
+!/requirements.txt
+!/src/**
+
+# Ignore unnecessary files inside allowed directories
+# This should go after the allowed directories
+**/__pycache__
