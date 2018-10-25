@@ -57,9 +57,12 @@ class Query:
         Print out terms in the query, and the postings found.
         :param results: list of postings.
         """
-        print("%s (original): %s" % (self.__class__.__name__, " ".join(self.original_terms)))
-        print("%s (stemmed): %s" % (self.__class__.__name__, " ".join(self.terms)))
-        print("%s result(s) found: %s\n" % ("{:,}".format(len(results)), ", ".join(map(str, results)) if len(results) > 0 else "there are no results matching your query."))
+        if results:
+            print("%s (original): %s" % (self.__class__.__name__, " ".join(self.original_terms)))
+            print("%s (stemmed): %s" % (self.__class__.__name__, " ".join(self.terms)))
+            print("%s result(s) found: %s\n" % ("{:,}".format(len(results)), ", ".join(map(str, results))))
+        else:
+            print("Your search didn't return any results.\n")
 
 
 class AndQuery(Query):
@@ -73,10 +76,13 @@ class AndQuery(Query):
         :return: postings list for a query using conjunction (and).
         """
         postings_lists = self.get_postings_lists()
-        results = sorted(set(postings_lists[0]).intersection(*[set(postings_list) for postings_list in postings_lists[1:]]))
+
+        try:
+            results = sorted(set(postings_lists[0]).intersection(*[set(postings_list) for postings_list in postings_lists[1:]]))
+        except IndexError:
+            results = []
 
         self.print_results(results)
-        return results
 
 
 class OrQuery(Query):
@@ -106,4 +112,3 @@ class OrQuery(Query):
         results = [posting for posting in postings_lists if not (posting in postings_lists_set or postings_lists_set_add(posting))]
 
         self.print_results(results)
-        return results
