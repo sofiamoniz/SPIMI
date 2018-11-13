@@ -29,6 +29,7 @@ class Reuters:
         self.reuters_files = self.__init_reuters_files()[:number_of_files]
 
         self.docs_per_block = docs_per_block
+        self.number_of_documents = 0
 
         self.remove_stopwords = remove_stopwords
         self.stem = stem
@@ -80,7 +81,6 @@ class Reuters:
         """
         tokens = []
         current_document = 0
-        number_of_documents = 0
         number_of_tokens = 0
         print("Parsing Reuters files...")
 
@@ -102,7 +102,7 @@ class Reuters:
                     terms = self.compress(terms)
                 token_pairs = [(term, document_id) for term in terms]
                 tokens.extend(token_pairs)
-                number_of_documents += 1
+                self.number_of_documents += 1
 
                 current_document += 1
                 if current_document == self.docs_per_block:
@@ -116,7 +116,7 @@ class Reuters:
             self.list_of_lists_of_tokens.append(tokens)
 
         print("Found %s documents and %s tokens. %d block file(s) will be generated.\n"
-              % ("{:,}".format(number_of_documents), "{:,}".format(number_of_tokens), len(self.list_of_lists_of_tokens)))
+              % ("{:,}".format(self.number_of_documents), "{:,}".format(number_of_tokens), len(self.list_of_lists_of_tokens)))
         return self.list_of_lists_of_tokens
 
     def compress(self, terms):

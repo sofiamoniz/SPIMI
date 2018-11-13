@@ -10,7 +10,7 @@ class SPIMI:
 
     def __init__(self, reuters):
         """
-        Initiate the SPIMI inverter with a list of tokens.
+        Initialize the SPIMI inverter with a list of tokens.
         :param reuters: Reuters object which will contain reuters files and methods to obtain tokens.
         """
         self.reuters = reuters

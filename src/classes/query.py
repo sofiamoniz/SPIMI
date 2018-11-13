@@ -8,15 +8,14 @@ from definitions import word_tokenize, ps
 
 class Query:
 
-    def __init__(self, index, terms):
+    def __init__(self, index):
         """
         Query constructor.
         :param index: dictionary with terms as keys, and their postings list as values.
-        :param terms: query which will be conducted, all stemmed
         """
         self.index = index
-        self.original_terms = terms.split()
-        self.terms = [ps.stem(term) for term in word_tokenize(terms)]
+        self.original_terms = []
+        self.terms = []
 
     @staticmethod
     def ask_user():
@@ -24,12 +23,27 @@ class Query:
         print()
         return query
 
-    def get_postings_lists(self):
+    def get_postings_list_of_one_term(self, term):
+        """
+        Get a term's postings list, i.e. list of document ID's of documents that it's in.
+        :param term: the term.
+        :return: list of doc IDs.
+        """
+        try:
+            return self.index[ps.stem(term)]
+        except KeyError:
+            print("That word does no exist in the index.")
+
+    def get_postings_lists(self, terms):
         """
         Split the query into individual terms.
         For each terms, store in a dictionary the documents in which the term appears (postings list).
+        :param: the user's query.
         :return: list of postings lists found from the terms in the query.
         """
+        self.original_terms = terms.split()
+        self.terms = [ps.stem(term) for term in word_tokenize(terms)]
+
         results = {}
 
         for term in self.terms:
@@ -41,10 +55,11 @@ class Query:
         return list(results.values())
 
     @abc.abstractmethod
-    def execute(self):
+    def execute(self, terms):
         """
         Abstract method, to be implemented by subclasses.
         If run by parent class, will print out message pointing out error.
+        :param terms: the user's query.
         :return: None
         """
         if self.__class__.__name__ == "Query":
@@ -67,15 +82,16 @@ class Query:
 
 class AndQuery(Query):
 
-    def __init__(self, index, terms):
-        Query.__init__(self, index, terms)
+    def __init__(self, index):
+        Query.__init__(self, index)
 
-    def execute(self):
+    def execute(self, terms):
         """
         Get postings lists and conduct their intersection.
+        :param terms: the user's query.
         :return: postings list for a query using conjunction (and).
         """
-        postings_lists = self.get_postings_lists()
+        postings_lists = self.get_postings_lists(terms)
 
         try:
             results = sorted(set(postings_lists[0]).intersection(*[set(postings_list) for postings_list in postings_lists[1:]]))
@@ -87,10 +103,10 @@ class AndQuery(Query):
 
 class OrQuery(Query):
 
-    def __init__(self, index, terms):
-        Query.__init__(self, index, terms)
+    def __init__(self, index):
+        Query.__init__(self, index)
 
-    def execute(self):
+    def execute(self, terms):
         """
         We get a list of postings lists at first.
         We want to make a flat list from each one of these lists.
@@ -99,9 +115,11 @@ class OrQuery(Query):
         list. We do this by initializing an empty set, and seeing which elements of the postings list appears the most.
         If it's not in the set, we add it. We repeat until there are no more elements in the initial list to go over.
 
+        :param terms: the user's query.
+
         :return: postings list for a query, with postings matching the most query terms are the beginning of the list.
         """
-        postings_lists = self.get_postings_lists()
+        postings_lists = self.get_postings_lists(terms)
         postings_lists = [posting for postings_list in postings_lists for posting in postings_list]
 
         postings_lists = sorted(postings_lists, key=lambda x: (postings_lists.count(x), -x), reverse=True)

@@ -6,6 +6,7 @@ from classes.reuters import Reuters
 from classes.spimi import SPIMI
 from classes.query import Query, AndQuery, OrQuery
 from classes.compression_table import CompressionTable
+from classes.bm25 import BM25
 
 import argparse
 
@@ -98,8 +99,12 @@ if __name__ == '__main__':
         if user_input == "":
             break
         elif user_input.lower() in ["and", "or"]:
+            and_query = AndQuery(index)
+            or_query = OrQuery(index)
             user_query = Query.ask_user()
             if user_input.lower() == "and":
-                AndQuery(index, user_query).execute()
+                and_query.execute(user_query)
             elif user_input.lower() == "or":
-                OrQuery(index, user_query).execute()
+                or_query.execute(user_query)
+
+    bm25 = BM25(index=index, n=reuters.number_of_documents)
