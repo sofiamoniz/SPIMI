@@ -107,4 +107,4 @@ if __name__ == '__main__':
             elif user_input.lower() == "or":
                 or_query.execute(user_query)
 
-    bm25 = BM25(index=index, n=reuters.number_of_documents)
+    bm25 = BM25(reuters=reuters, index=index, n=reuters.number_of_documents)

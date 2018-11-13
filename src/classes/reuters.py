@@ -30,6 +30,7 @@ class Reuters:
 
         self.docs_per_block = docs_per_block
         self.number_of_documents = 0
+        self.number_of_tokens = 0
 
         self.remove_stopwords = remove_stopwords
         self.stem = stem
@@ -39,6 +40,10 @@ class Reuters:
         self.will_compress = self.remove_stopwords or self.stem or self.case_folding or self.remove_numbers
 
         self.list_of_lists_of_tokens = []
+
+        # dictionary with key -> doc ID and value -> length of that document in words
+        self.document_lengths = {}
+        self.average_document_length = 0
 
     def get_reuters(self):
         """
@@ -81,7 +86,6 @@ class Reuters:
         """
         tokens = []
         current_document = 0
-        number_of_tokens = 0
         print("Parsing Reuters files...")
 
         for file in self.reuters_files:
@@ -104,19 +108,23 @@ class Reuters:
                 tokens.extend(token_pairs)
                 self.number_of_documents += 1
 
+                self.document_lengths[document_id] = len(token_pairs)
+
                 current_document += 1
                 if current_document == self.docs_per_block:
-                    number_of_tokens += len(tokens)
+                    self.number_of_tokens += len(tokens)
                     self.list_of_lists_of_tokens.append(tokens)
                     tokens = []
                     current_document = 0
 
         if tokens:
-            number_of_tokens += len(tokens)
+            self.number_of_tokens += len(tokens)
             self.list_of_lists_of_tokens.append(tokens)
 
+        self.average_document_length = self.number_of_tokens / self.number_of_documents
         print("Found %s documents and %s tokens. %d block file(s) will be generated.\n"
-              % ("{:,}".format(self.number_of_documents), "{:,}".format(number_of_tokens), len(self.list_of_lists_of_tokens)))
+              % ("{:,}".format(self.number_of_documents), "{:,}".format(self.number_of_tokens), len(self.list_of_lists_of_tokens)))
+
         return self.list_of_lists_of_tokens
 
     def compress(self, terms):
