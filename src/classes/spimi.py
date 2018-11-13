@@ -181,7 +181,7 @@ class SPIMI:
                 min_index = lines.index(min(lines))
                 line = lines[min_index]
                 current_term = line.split()[0]
-                current_postings = " ".join(map(str, sorted(set(map(int, line.split()[1:])))))
+                current_postings = " ".join(map(str, sorted(list(map(int, line.split()[1:])))))
 
                 if current_term != most_recent_term:
                     output_index.write("\n%s %s" % (current_term, current_postings))
@@ -213,7 +213,7 @@ class SPIMI:
         - We split it, using a space (" ") as the delimiter (default).
         - The first value in the list is the term (-> key).
         - The rest of the values in the list are the postings (-> value).
-            • We make sure to make the postings a (sorted) set, so as to eliminate duplicates.
+            • We make sure to make the postings are sorted.
 
         :return: the inverted index, i.e. the dictionary containing terms as keys, and a set of postings as values.
         """
