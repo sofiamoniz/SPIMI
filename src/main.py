@@ -27,7 +27,7 @@ def stem_index(index):
         if ps.stem(k) not in new_index.keys():
             new_index[ps.stem(k)] = index[k]
         else:
-            new_index[ps.stem(k)] = list(set().union(new_index[ps.stem(k)], index[k]))
+            new_index[ps.stem(k)] = new_index[ps.stem(k)] + index[k]
 
     return new_index
 
