@@ -4,7 +4,7 @@
 from math import log10
 from operator import itemgetter
 
-from definitions import ps, word_tokenize
+from definitions import ps, word_tokenize, stopwords
 from classes.query import Query, OrQuery
 
 
@@ -92,8 +92,9 @@ class BM25:
         Compute the Okapi BM25 ranking formula to rank retrieved documents by relevance.
         :param query: query to be conducted.
         """
+        terms = [ps.stem(term) for term in word_tokenize(query) if term.casefold() not in stopwords]
+        query = " ".join(terms)
         doc_ids = OrQuery(self.index).execute(query)
-        terms = [ps.stem(term) for term in word_tokenize(query)]
         rank = {}
 
         for doc_id in doc_ids:
