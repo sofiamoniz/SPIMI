@@ -14,8 +14,10 @@ class Query:
         :param index: dictionary with terms as keys, and their postings list as values.
         """
         self.index = index
-        self.original_terms = []
+        self.original_terms = ""
         self.terms = []
+
+        self.most_recent_results = []
 
     @staticmethod
     def ask_user():
@@ -32,7 +34,7 @@ class Query:
         try:
             return self.index[ps.stem(term)]
         except KeyError:
-            print("That word does no exist in the index.")
+            return []
 
     def get_postings_lists(self, terms):
         """
@@ -41,7 +43,7 @@ class Query:
         :param: the user's query.
         :return: list of postings lists found from the terms in the query.
         """
-        self.original_terms = terms.split()
+        self.original_terms = terms
         self.terms = [ps.stem(term) for term in word_tokenize(terms)]
 
         results = {}
@@ -67,15 +69,15 @@ class Query:
             print("Make sure to use either AndQuery or OrQuery.\n")
         return
 
-    def print_results(self, results):
+    def print_results(self):
         """
         Print out terms in the query, and the postings found.
         :param results: list of postings.
         """
-        if results:
-            print("%s (original): %s" % (self.__class__.__name__, " ".join(self.original_terms)))
+        if self.most_recent_results:
+            print("%s (original): %s" % (self.__class__.__name__, self.original_terms))
             print("%s (stemmed): %s" % (self.__class__.__name__, " ".join(self.terms)))
-            print("%s result(s) found: %s\n" % ("{:,}".format(len(results)), ", ".join(map(str, results))))
+            print("%s result(s) found: %s\n" % ("{:,}".format(len(self.most_recent_results)), ", ".join(map(str, self.most_recent_results))))
         else:
             print("Your search didn't return any results.\n")
 
@@ -94,11 +96,11 @@ class AndQuery(Query):
         postings_lists = self.get_postings_lists(terms)
 
         try:
-            results = sorted(set(postings_lists[0]).intersection(*[set(postings_list) for postings_list in postings_lists[1:]]))
+            self.most_recent_results = sorted(set(postings_lists[0]).intersection(*[set(postings_list) for postings_list in postings_lists[1:]]))
         except IndexError:
-            results = []
+            self.most_recent_results = []
 
-        self.print_results(results)
+        return self.most_recent_results
 
 
 class OrQuery(Query):
@@ -127,6 +129,6 @@ class OrQuery(Query):
         postings_lists_set = set()
         postings_lists_set_add = postings_lists_set.add
 
-        results = [posting for posting in postings_lists if not (posting in postings_lists_set or postings_lists_set_add(posting))]
+        self.most_recent_results = [posting for posting in postings_lists if not (posting in postings_lists_set or postings_lists_set_add(posting))]
 
-        self.print_results(results)
+        return self.most_recent_results

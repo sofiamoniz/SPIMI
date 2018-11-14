@@ -95,7 +95,7 @@ if __name__ == '__main__':
     After outputting results, repeat.
     """
     while True:
-        user_input = input("Would you like to conduct an AND query or an OR query? Hit enter to end the program. [and/or] ")
+        user_input = input("Would you like to conduct an AND query or an OR query? Hit enter for no. [and/or] ")
         if user_input == "":
             break
         elif user_input.lower() in ["and", "or"]:
@@ -104,7 +104,19 @@ if __name__ == '__main__':
             user_query = Query.ask_user()
             if user_input.lower() == "and":
                 and_query.execute(user_query)
+                and_query.print_results()
             elif user_input.lower() == "or":
                 or_query.execute(user_query)
+                or_query.print_results()
 
     bm25 = BM25(reuters=reuters, index=index, n=reuters.number_of_documents)
+    while True:
+        choices = {"y": True, "n": False}
+        user_input = input("Would you like to experiment with the Okapi BM25 ranking function? [y/n] ")
+        if user_input.lower() not in choices:
+            pass
+        elif choices[user_input.lower()]:
+            user_query = Query.ask_user()
+            bm25.compute_bm25(user_query)
+        elif not choices[user_input.lower()]:
+            break
