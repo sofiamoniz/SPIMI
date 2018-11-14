@@ -28,7 +28,7 @@ class BM25:
                 Christopher D. Manning, Prabhakar Raghavan, and Hinrich Schütze
 
         The equation we will model is the following:
-        ∑ (every term in query) [ log10(N / df_t) * ( (k1 + 1)tf_td / (k1((1 - b) + b * (L_d / L_ave)) + tf_td) ) ]
+        ∑ (for term in query) [ log10(N / df_t) * ( (k1 + 1)tf_td / (k1((1 - b) + b * (L_d / L_ave)) + tf_td) ) ]
         """
         self.reuters = reuters
         self.index = index
@@ -104,6 +104,7 @@ class BM25:
 
         sorted_rank = sorted(rank.items(), key=itemgetter(1), reverse=True)
 
+        print("{} documents found.".format(len(doc_ids)))
         for k, v in sorted_rank:
             print("Document {} score: {}".format(k, v))
         print()
