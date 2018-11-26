@@ -23,23 +23,23 @@ Or just run it with [Docker](#docker).
 
 I also included a Dockerfile to make it easier to run on any machine. First, make sure you `cd` into this repository.
 
-Build the Docker image by running `docker build -t comp479:project-1 .`. The `-t` is used to tag the image, you can tag it however you like.
+Build the Docker image by running `docker build -t comp479:project-2 .`. The `-t` is used to tag the image, you can tag it however you like.
 
 To run the container:
 
-1. Run `docker container run -dit --name spimi comp479:project-1`. This will start a container in the background (because of the `-d` or `--detach` option).
+1. Run `docker container run -dit --name spimi comp479:project-2`. This will start a container in the background (because of the `-d` or `--detach` option).
     - You can add the `--rm` option, which will delete the container once you `exit` out of the shell.
     - You can also name the container however you like; I named it spimi.
 2. To get access to an interactive Bash terminal: `docker container exec -it spimi bash`. You can [run the program](#running) from there.
 
 Another way to get access to the terminal is by running the `bash` command as you first run the container:
 
-1. `docker container run -dit --name spimi comp479:project-1 bash`.
+1. `docker container run -dit --name spimi comp479:project-2 bash`.
 2. `docker container attach spimi` will give you access to the `bash` terminal. If you hadn't specified `bash` previously, it would give you access to the `python` console.
 
 Another way is to just dismiss the detached mode and just run:
 
-1. `docker container run -it --name spimi comp479:project-1 bash`
+1. `docker container run -it --name spimi comp479:project-2 bash`
 2. Once you `exit` out, the container will stop.
 3. To restart it, run `docker container start spimi`.
 4. To go back in the shell, do `docker container attach spimi` or `docker container exec -it spimi bash`.

@@ -69,5 +69,5 @@ venv
 __pycache__
 reuters21578
 DISK*
-Project Report 1.pages
-Project Report 2.pages
+*.pages
+test-queries.txt
