@@ -75,7 +75,9 @@ Generated files will appear in the root directory of the repository.
 
 ## Report
 
-A project report showcasing a more detailed description of the project is available [here](Project%20Report.pdf).
+A project report showcasing a more detailed description of the SPIMI is available [here](Project%201%20Report.pdf).
+
+The one showcasing the Okapi BM ranking function can be viewed [here](Project%202%20Report.pdf).
 
 The Expectations of Originality form is available [here](Expectations%20of%20Originality.pdf).
 
