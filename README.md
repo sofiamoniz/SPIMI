@@ -23,28 +23,14 @@ Or just run it with [Docker](#docker).
 
 I also included a Dockerfile to make it easier to run on any machine. First, make sure you `cd` into this repository.
 
-Build the Docker image by running `docker build -t comp479:project-2 .`. The `-t` is used to tag the image, you can tag it however you like.
+To build the image and start up a container:
 
-To run the container:
+```
+docker image build -t spimi .
+docker container run -it --name spimi-demo spimi bash
+```
 
-1. Run `docker container run -dit --name spimi comp479:project-2`. This will start a container in the background (because of the `-d` or `--detach` option).
-    - You can add the `--rm` option, which will delete the container once you `exit` out of the shell.
-    - You can also name the container however you like; I named it spimi.
-2. To get access to an interactive Bash terminal: `docker container exec -it spimi bash`. You can [run the program](#running) from there.
-
-Another way to get access to the terminal is by running the `bash` command as you first run the container:
-
-1. `docker container run -dit --name spimi comp479:project-2 bash`.
-2. `docker container attach spimi` will give you access to the `bash` terminal. If you hadn't specified `bash` previously, it would give you access to the `python` console.
-
-Another way is to just dismiss the detached mode and just run:
-
-1. `docker container run -it --name spimi comp479:project-2 bash`
-2. Once you `exit` out, the container will stop.
-3. To restart it, run `docker container start spimi`.
-4. To go back in the shell, do `docker container attach spimi` or `docker container exec -it spimi bash`.
-
-There are so many ways to do this.
+This will take you to an interactive Bash terminal, from which you can [run](#running) the script. You can include the `--rm` option in the `run` command to automatically remove the container when you exit out of it.
 
 ### Running
 
@@ -55,17 +41,16 @@ python3 main.py [-d DOCS_PER_BLOCK]
                 [-r {1, 2, 3, ..., 22}]
                 [-rs] [-s] [-c] [-rn]
                 [-a]
+
+optional arguments:
+    -d, --docs                      number of documents per block (default 500)
+    -r, --reuters                   number of Reuters files to parse (1-22) (default 22)
+    -rs, --remove-stopwords         remove stopwords from the index
+    -s, --stem                      stem terms in the index
+    -c, --case-folding              reduce terms in the index to lowercase
+    -rn, --remove-numbers           remove numbers from the index
+    -a, --all                       use options -rs, -s, -c, and -rn
 ```
-
-The arguments are the following:
-
-1. `-d` or `--docs`: number of documents per block. Default is 500.
-2. `-r` or `--reuters`: number of Reuters files to parse, choice from 1 to 22. Default is 22.
-3. `-rs` or `--remove-stopwords`: stopwords will be removed from index. Default is false.
-4. `-s` or `--stem`: terms in index will be stemmed. Default is false.
-5. `-c` or `--case-folding`: terms in index will be converted to lowercase. Default is false.
-6. `-rn` or `--remove-numbers`: terms that are just numbers will be removed from index. Default is false.
-7. `-a` or `--all`: includes options 3 to 6. Default is false.
 
 Generated files will appear in the root directory of the repository.
 
